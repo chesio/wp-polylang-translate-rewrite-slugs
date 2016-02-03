@@ -19,28 +19,35 @@ Translate rewrite slugs for post types by doing 5 things:
 
 To translate a post type rewrite slug, add the filter "pll_translated_post_type_rewrite_slugs" to your functions.php file or your plugin and add the "has_archive" and "rewrite" key has you normally do for the params of the "register_post_type" Wordpress function but add it for each post type and language you want.
 
-Example
+Examples:
 ~~~php
 <?php
 add_filter('pll_translated_post_type_rewrite_slugs', function($post_type_translated_slugs) {
 	// Add translation for "product" post type.
-	$post_type_translated_slugs = array(
-		'product' => array(
-			'fr' => array(
-				'has_archive' => true,
-				'rewrite' => array(
-					'slug' => 'produit',
-				),
+	$post_type_translated_slugs['product'] = array(
+		'fr' => array(
+			'has_archive' => true,
+			'rewrite' => array(
+				'slug' => 'produit',
 			),
-			'en' => array(
-				'has_archive' => true,
-				'rewrite' => array(
-					'slug' => 'product',
-				),
+		),
+		'en' => array(
+			'has_archive' => true,
+			'rewrite' => array(
+				'slug' => 'product',
 			),
 		),
 	);
 	return $post_type_translated_slugs;
 });
+
+add_filter('pll_translated_taxonomy_rewrite_slugs', function($taxonomy_translated_slugs) {
+	// Add translation for "color" taxonomy.
+	$taxonomy_translated_slugs['color'] = array(
+		'fr' => 'couleur'
+		'en' => 'color',
+	);
+	return $taxonomy_translated_slugs;
+}
 ?>
 ~~~
