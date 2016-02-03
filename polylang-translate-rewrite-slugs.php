@@ -339,7 +339,13 @@ class Polylang_Translate_Rewrite_Slugs {
 		if (is_category()) {
 			$term = get_category_by_slug($wp_query->get('category_name'));
 			$translated_term = get_term(pll_get_term($term->term_id, $lang), $term->taxonomy);
-			return home_url('/'.$lang.'/'.$translated_term->slug);
+
+			if ( $polylang->options['hide_default'] && ($lang === pll_default_language()) ) {
+				return home_url('/' . $translated_term->slug);
+			}
+			else {
+				return home_url('/' . $lang. '/' . $translated_term->slug);
+			}
 		}
 		elseif (is_archive()) {
 			$post_type = $wp_query->query_vars['post_type'];
