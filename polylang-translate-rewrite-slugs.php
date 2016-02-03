@@ -12,7 +12,7 @@ License: GPLv2 or later
 /*  Copyright 2014  Kristoffer Laurin-Racicot  (email : kristoffer.lr@gmail.com)
 
 	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License, version 2, as 
+	it under the terms of the GNU General Public License, version 2, as
 	published by the Free Software Foundation.
 
 	This program is distributed in the hope that it will be useful,
@@ -175,18 +175,16 @@ class Polylang_Translate_Rewrite_Slugs {
 	 * Fix "get_permalink" for this post type.
 	 */
 	public function post_type_link_filter($post_link, $post, $leavename, $sample) {
-		global $polylang;
-
-		// We always check for the post language. Otherwise, the current language.
-		$post_language = $polylang->model->get_post_language($post->ID);
-		if ($post_language) {
-			$lang = $post_language->slug;
-		} else {
-			$lang = pll_default_language();
-		}
 
 		// Check if the post type is handle.
 		if (isset($this->post_types[$post->post_type])) {
+			// We always check for the post language.
+			$lang = pll_get_post_language($post->ID, 'slug');
+			if ( !$lang ) {
+				// If post has no language assigned, use default language as fallback.
+				$lang = pll_default_language();
+			}
+
 			// Build URL. Lang prefix is already handle.
 			return home_url('/'.$this->post_types[$post->post_type]->translated_slugs[$lang]->rewrite['slug'].'/'.($leavename?"%$post->post_type%":get_page_uri( $post->ID )));
 		}
@@ -260,9 +258,9 @@ class Polylang_Translate_Rewrite_Slugs {
 	 * Fix "get_term_link" for this taxonomy.
 	 */
 	public function term_link_filter($termlink, $term, $taxonomy) {
+
 		// Check if the post type is handle.
 		if (isset($this->taxonomies[$taxonomy])) {
-			global $wp_rewrite, $polylang;
 
 			if ( !is_object($term) ) {
 				if ( is_int($term) ) {
@@ -279,10 +277,9 @@ class Polylang_Translate_Rewrite_Slugs {
 				return $term;
 
 			// Get the term language.
-			$term_language = $polylang->model->get_term_language($term->term_id);
-			if ($term_language) {
-				$lang = $term_language->slug;
-			} else {
+			$lang = pll_get_term_language($term->term_id, 'slug');
+			if ( !$lang ) {
+				// If term has no language assigned, use default language as fallback.
 				$lang = pll_default_language();
 			}
 			// Check if the language is handle.
