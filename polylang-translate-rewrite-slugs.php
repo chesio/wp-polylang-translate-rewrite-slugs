@@ -128,47 +128,51 @@ class Polylang_Translate_Rewrite_Slugs {
 	 * Create a "PLL_TRS_Post_Type" and add it to the handled post type list.
 	 */
 	public function add_post_type($post_type, $translated_slugs) {
-		global $polylang;
-
-		$languages = $polylang->model->get_languages_list();
 		$post_type_object = get_post_type_object($post_type);
-		if (!is_null($post_type_object)) {
-			foreach ($languages as $language) {
-				// Add non specified slug translation to post type default.
-				if (!array_key_exists($language->slug, $translated_slugs)) {
-					$translated_slugs[$language->slug] = array();
-				}
-				// Trim "/" of the slug.
-				if (isset($translated_slugs[$language->slug]['rewrite']['slug'])) {
-					$translated_slugs[$language->slug]['rewrite']['slug'] = trim($translated_slugs[$language->slug]['rewrite']['slug'], '/');
-				}
-			}
-			$this->post_types[$post_type] = new PLL_TRS_Post_Type($post_type_object, $translated_slugs);
+		// Sanity check
+		if ( is_null($post_type_object) ) {
+			return;
 		}
+
+		$languages = pll_languages_list( array('fields' => 'slug') );
+
+		foreach ($languages as $lang) {
+			// Add non specified slug translation to post type default.
+			if (!array_key_exists($lang, $translated_slugs)) {
+				$translated_slugs[$lang] = array();
+			}
+			// Trim "/" of the slug.
+			if (isset($translated_slugs[$lang]['rewrite']['slug'])) {
+				$translated_slugs[$lang]['rewrite']['slug'] = trim($translated_slugs[$lang]['rewrite']['slug'], '/');
+			}
+		}
+		$this->post_types[$post_type] = new PLL_TRS_Post_Type($post_type_object, $translated_slugs);
 	}
 
 	/**
 	 * ...
 	 */
 	public function add_taxonomy($taxonomy, $translated_slugs) {
-		global $polylang;
-
-		$languages = $polylang->model->get_languages_list();
 		$taxonomy_object = get_taxonomy($taxonomy);
-		if (!is_null($taxonomy_object)) {
-			$translated_struct = array();
-			foreach ($languages as $language) {
-				// Add non specified slug translation to taxonomy default.
-				if (!array_key_exists($language->slug, $translated_slugs)) {
-					$translated_slugs[$language->slug] = $taxonomy_object->rewrite['slug'];
-				}
-				// Trim "/".
-				$translated_slugs[$language->slug] = trim($translated_slugs[$language->slug], '/');
-				// Generate "struct" with "slug" as WordPress would do.
-				$translated_struct[$language->slug] = $translated_slugs[$language->slug] . "/%{$taxonomy_object->name}%";
-			}
-			$this->taxonomies[$taxonomy] = new PLL_TRS_Taxonomy($taxonomy_object, $translated_slugs, $translated_struct);
+		// Sanity check
+		if ( is_null($taxonomy_object) ) {
+			return;
 		}
+
+		$languages = pll_languages_list( array('fields' => 'slug') );
+
+		$translated_struct = array();
+		foreach ($languages as $lang) {
+			// Add non specified slug translation to taxonomy default.
+			if (!array_key_exists($lang, $translated_slugs)) {
+				$translated_slugs[$lang] = $taxonomy_object->rewrite['slug'];
+			}
+			// Trim "/".
+			$translated_slugs[$lang] = trim($translated_slugs[$lang], '/');
+			// Generate "struct" with "slug" as WordPress would do.
+			$translated_struct[$lang] = $translated_slugs[$lang] . "/%{$taxonomy_object->name}%";
+		}
+		$this->taxonomies[$taxonomy] = new PLL_TRS_Taxonomy($taxonomy_object, $translated_slugs, $translated_struct);
 	}
 
 	/**
