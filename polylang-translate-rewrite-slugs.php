@@ -63,7 +63,7 @@ define('PLL_TRS_INC', PLL_TRS_DIR . '/include');
  *  add_filter('pll_translated_taxonomy_rewrite_slugs', function($taxonomy_translated_slugs) {
  *  	// Add translation for "color" taxonomy.
  *  	$taxonomy_translated_slugs['color'] = array(
- *  		'fr' => 'couleur'
+ *  		'fr' => 'couleur',
  *  		'en' => 'color',
  *  	);
  *  	return $taxonomy_translated_slugs;
